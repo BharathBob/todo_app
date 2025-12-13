@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import '../model/todo.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../provider/todo_provider.dart';
 
-class AddTodoScreen extends StatefulWidget {
+class AddTodoScreen extends ConsumerStatefulWidget {
   final Todo? initialTodo;
   const AddTodoScreen({super.key, this.initialTodo});
 
   @override
-  State<AddTodoScreen> createState() => _AddTodoScreenState();
+  ConsumerState<AddTodoScreen> createState() => _AddTodoScreenState();
 }
 
-class _AddTodoScreenState extends State<AddTodoScreen> {
+class _AddTodoScreenState extends ConsumerState<AddTodoScreen> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
 
@@ -33,7 +35,7 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
       isCompleted: widget.initialTodo?.isCompleted ?? false,
       createdAt: widget.initialTodo?.createdAt ?? DateTime.now(),
     );
-
+    ref.read(todoProvider.notifier).addTodo(todo);  
     Navigator.pop(context, todo);
   }
 
