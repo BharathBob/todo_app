@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import '../model/todo.dart';
 import '../view/add_todo_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../provider/todo_provider.dart';
 
-class TodosListView extends ConsumerWidget {
+ class TodosListView extends ConsumerWidget {
   final List<Todo> todos;
   final String Function(DateTime) formatTime;
   final void Function(int index, Todo updated) onUpdate;
@@ -18,7 +17,6 @@ class TodosListView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final todos = ref.watch(todoProvider);
     return ListView.builder(
       itemCount: todos.length,
       itemBuilder: (context, index) {

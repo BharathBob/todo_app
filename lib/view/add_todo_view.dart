@@ -15,6 +15,7 @@ class AddTodoScreen extends ConsumerStatefulWidget {
 class _AddTodoScreenState extends ConsumerState<AddTodoScreen> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _sharedWithController = TextEditingController();
 
   @override
   void initState() {
@@ -22,11 +23,23 @@ class _AddTodoScreenState extends ConsumerState<AddTodoScreen> {
     if (widget.initialTodo != null) {
       _titleController.text = widget.initialTodo!.title;
       _descriptionController.text = widget.initialTodo!.description;
+      _sharedWithController.text =
+          widget.initialTodo!.sharedWith.join(', ');
     }
   }
 
-  void _saveTodo() {
+  void _saveTodo() async {
     if (_titleController.text.isEmpty) return;
+
+    final sharedWith = _sharedWithController.text
+        .split(',')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
+
+    if (!sharedWith.contains('viswa@example.com')) {
+      sharedWith.add('viswa@example.com');
+    }
 
     final todo = Todo(
       taskid: widget.initialTodo?.taskid ?? const Uuid().v4(),
@@ -34,8 +47,10 @@ class _AddTodoScreenState extends ConsumerState<AddTodoScreen> {
       description: _descriptionController.text,
       isCompleted: widget.initialTodo?.isCompleted ?? false,
       createdAt: widget.initialTodo?.createdAt ?? DateTime.now(),
+      sharedWith: sharedWith,
     );
-    ref.read(todoProvider.notifier).addTodo(todo);  
+
+    await ref.read(todoRepositoryProvider).addOrUpdateTodo(todo);
     Navigator.pop(context, todo);
   }
 
@@ -50,13 +65,21 @@ class _AddTodoScreenState extends ConsumerState<AddTodoScreen> {
           children: [
             TextField(
               controller: _titleController,
-              decoration: const InputDecoration(labelText: 'What you want to do?'),
+              decoration:
+                  const InputDecoration(labelText: 'What you want to do?'),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: _descriptionController,
-              decoration: const InputDecoration(labelText: 'Add more details...'),
+              decoration:
+                  const InputDecoration(labelText: 'Add more details...'),
               maxLines: 3,
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _sharedWithController,
+              decoration: const InputDecoration(
+                  labelText: 'Share with (comma separated emails)'),
             ),
             const Spacer(),
             SizedBox(
@@ -70,10 +93,10 @@ class _AddTodoScreenState extends ConsumerState<AddTodoScreen> {
                 onPressed: _saveTodo,
                 child: Text(isEditing ? 'Save' : 'Create Todo'),
               ),
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
-}
