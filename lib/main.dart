@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:todo_app/view/dashboard_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'app/auth_gate.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +19,7 @@ class TodoApp extends StatelessWidget {
     return MaterialApp(
       title: 'TODO App',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const TodoListScreen(),
+      home: const AuthGate(),
     );
   }
 }

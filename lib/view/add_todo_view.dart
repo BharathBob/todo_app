@@ -3,7 +3,8 @@ import 'package:uuid/uuid.dart';
 import '../model/todo.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../provider/todo_provider.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
+ 
 class AddTodoScreen extends ConsumerStatefulWidget {
   final Todo? initialTodo;
   const AddTodoScreen({super.key, this.initialTodo});
@@ -40,6 +41,8 @@ class _AddTodoScreenState extends ConsumerState<AddTodoScreen> {
     if (!sharedWith.contains('viswa@example.com')) {
       sharedWith.add('viswa@example.com');
     }
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
 
     final todo = Todo(
       taskid: widget.initialTodo?.taskid ?? const Uuid().v4(),
@@ -47,7 +50,8 @@ class _AddTodoScreenState extends ConsumerState<AddTodoScreen> {
       description: _descriptionController.text,
       isCompleted: widget.initialTodo?.isCompleted ?? false,
       createdAt: widget.initialTodo?.createdAt ?? DateTime.now(),
-      sharedWith: sharedWith,
+      sharedWith: [user.uid],
+      creatorId: FirebaseAuth.instance.currentUser!.uid,
     );
 
     await ref.read(todoRepositoryProvider).addOrUpdateTodo(todo);

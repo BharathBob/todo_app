@@ -4,7 +4,6 @@ import 'add_todo_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../provider/todo_provider.dart';
 
-
 class TodoListScreen extends ConsumerWidget {
   const TodoListScreen({super.key});
 
@@ -39,11 +38,10 @@ class TodoListScreen extends ConsumerWidget {
               ),
             ),
           );
-            if (newTodo != null) {
-    // Trigger a refresh of the stream by invalidating the provider
-    ref.refresh(todoStreamProvider);
-  }
-
+          if (newTodo != null) {
+            // Trigger a refresh of the stream by invalidating the provider
+            ref.refresh(todoStreamProvider);
+          }
         },
       ),
       body: todosAsync.when(
@@ -56,16 +54,17 @@ class TodoListScreen extends ConsumerWidget {
             itemBuilder: (context, index) {
               final todo = todos[index];
               return Card(
-                margin:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 child: ListTile(
                   title: Text(todo.title),
                   subtitle: Text(todo.description),
                   trailing: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(_formatTime(todo.createdAt),
-                          style: const TextStyle(fontSize: 12)),
+                      Text(
+                        _formatTime(todo.createdAt),
+                        style: const TextStyle(fontSize: 12),
+                      ),
                       Checkbox(
                         value: todo.isCompleted,
                         onChanged: (value) async {
@@ -76,6 +75,7 @@ class TodoListScreen extends ConsumerWidget {
                             isCompleted: value!,
                             createdAt: todo.createdAt,
                             sharedWith: todo.sharedWith,
+                            creatorId: todo.creatorId,
                           );
                           await ref
                               .read(todoRepositoryProvider)
@@ -90,13 +90,19 @@ class TodoListScreen extends ConsumerWidget {
                       isScrollControlled: true,
                       builder: (context) => Padding(
                         padding: EdgeInsets.only(
-                            bottom: MediaQuery.of(context).viewInsets.bottom),
+                          bottom: MediaQuery.of(context).viewInsets.bottom,
+                        ),
                         child: SizedBox(
                           height: MediaQuery.of(context).size.height * 0.85,
                           child: AddTodoScreen(initialTodo: todo),
                         ),
                       ),
                     );
+                    if (updated != null) {
+                      await ref
+                          .read(todoRepositoryProvider)
+                          .addOrUpdateTodo(updated);
+                    }
                   },
                 ),
               );

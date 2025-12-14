@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../model/todo.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 final firestoreProvider = Provider<FirebaseFirestore>((ref) {
   final firestore = FirebaseFirestore.instance;
@@ -11,15 +12,12 @@ final firestoreProvider = Provider<FirebaseFirestore>((ref) {
       cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
     );
   } on FirebaseException catch (e) {
-    // 'failed-precondition' -> multiple tabs; 'unimplemented' -> browser doesn't support persistence
-    if (e.code == 'failed-precondition' || e.code == 'unimplemented') {
-      // fallback: continue without persistence (allowed)
-    } else {
+     if (e.code == 'failed-precondition' || e.code == 'unimplemented') {
+     } else {
       rethrow;
     }
   } catch (_) {
-    // ignore any other persistence errors and continue
-  }
+   }
 
   return firestore;
 });
@@ -33,29 +31,39 @@ class TodoRepository {
   final FirebaseFirestore firestore;
   TodoRepository(this.firestore);
 
-  Future<void> addOrUpdateTodo(Todo todo) async {
-    await firestore.collection('todos').doc(todo.taskid).set(todo.toFirestore());
-  }
+Future<void> addOrUpdateTodo(Todo todo) async {
+  print("addOrUpdateTodo called");
 
-Stream<List<Todo>> todosForUser(String userEmail) {
+  await firestore
+      .collection('todos')
+      .doc(todo.taskid)
+      .set(
+        todo.toFirestore(),
+        SetOptions(merge: true),
+      );
+}
+
+Stream<List<Todo>> todosForUser(String userId) {
   return firestore
       .collection('todos')
-      .where('sharedWith', arrayContains: userEmail)
+      .where('sharedWithUids', arrayContains: userId)
       .snapshots()
       .map((snapshot) {
         final list = snapshot.docs
-            .map((doc) => Todo.fromFirestore(doc.data() as Map<String, dynamic>, doc.id))
+            .map((doc) => Todo.fromFirestore(doc.data(), doc.id))
             .toList();
         list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
         return list;
       });
-}}
+}
+}
 
 final todoStreamProvider = StreamProvider<List<Todo>>((ref) {
   final repository = ref.watch(todoRepositoryProvider);
-  final currentUserEmail = 'bharath.viswa1@gmail.com'; 
-  return repository.todosForUser(currentUserEmail).handleError((e, st) {
-    print('Firestore error: $e');
-    return [];
-  });
+  final user = FirebaseAuth.instance.currentUser;
+
+  if (user == null) return const Stream.empty();
+
+  print('UID: ${user.uid}');
+  return repository.todosForUser(user.uid);
 });
