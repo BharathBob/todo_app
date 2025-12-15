@@ -4,9 +4,9 @@ class Todo {
   final String taskid;
   final String title;
   final String description;
-  bool isCompleted;
+  final bool isCompleted;
   final DateTime createdAt;
-  final List<String> sharedWith; 
+  final List<String> sharedWithUids;
   final String creatorId;
 
   Todo({
@@ -15,7 +15,7 @@ class Todo {
     required this.description,
     this.isCompleted = false,
     required this.createdAt,
-    this.sharedWith = const [],
+    this.sharedWithUids = const [],
     required this.creatorId,
   });
 
@@ -26,19 +26,18 @@ class Todo {
       description: data['description'],
       isCompleted: data['isCompleted'] ?? false,
       createdAt: (data['createdAt'] as Timestamp).toDate(),
-      sharedWith: List<String>.from(data['sharedWith'] ?? []),
+      sharedWithUids: List<String>.from(data['sharedWithUids'] ?? []),
       creatorId: data['creatorId'] ?? '',
     );
   }
 
   Map<String, dynamic> toFirestore() {
     return {
-      'taskid': taskid,
       'title': title,
       'description': description,
       'isCompleted': isCompleted,
       'createdAt': Timestamp.fromDate(createdAt),
-      'sharedWith': sharedWith,
+      'sharedWithUids': sharedWithUids,
       'creatorId': creatorId,
     };
   }

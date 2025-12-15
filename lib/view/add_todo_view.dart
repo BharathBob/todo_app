@@ -25,7 +25,7 @@ class _AddTodoScreenState extends ConsumerState<AddTodoScreen> {
       _titleController.text = widget.initialTodo!.title;
       _descriptionController.text = widget.initialTodo!.description;
       _sharedWithController.text =
-          widget.initialTodo!.sharedWith.join(', ');
+          widget.initialTodo!.sharedWithUids.join(', ');
     }
   }
 
@@ -50,7 +50,7 @@ class _AddTodoScreenState extends ConsumerState<AddTodoScreen> {
       description: _descriptionController.text,
       isCompleted: widget.initialTodo?.isCompleted ?? false,
       createdAt: widget.initialTodo?.createdAt ?? DateTime.now(),
-      sharedWith: [user.uid],
+      sharedWithUids: [user.uid],
       creatorId: FirebaseAuth.instance.currentUser!.uid,
     );
 

@@ -52,7 +52,7 @@ class TodosListView extends ConsumerWidget {
     );
 
     if (email == null || email.isEmpty) return;
-    if (todo.sharedWith.contains(email)) return;
+    if (todo.sharedWithUids.contains(email)) return;
 
     final updatedTodo = Todo(
       taskid: todo.taskid,
@@ -60,7 +60,7 @@ class TodosListView extends ConsumerWidget {
       description: todo.description,
       createdAt: todo.createdAt,
       creatorId: todo.creatorId,
-      sharedWith: [...todo.sharedWith, email],
+      sharedWithUids: [...todo.sharedWithUids, email],
     );
 
     await ref
@@ -70,16 +70,17 @@ class TodosListView extends ConsumerWidget {
 
   /// Add new task
   Future<void> _addTask(BuildContext context, WidgetRef ref) async {
-    final todo = await showModalBottomSheet<Todo>(
-      context: context,
-      isScrollControlled: true,
-      builder: (_) => const AddTodoScreen(),
-    );
+  final todo = await showModalBottomSheet<Todo>(
+    context: context,
+    isScrollControlled: true,
+    builder: (_) => const AddTodoScreen(),
+  );
 
-    // if (todo != null) {
-    //   await ref.read(todoRepositoryProvider).addOrUpdateTodo(todo);
-    // }
+  if (todo != null) {
+    await ref.read(todoRepositoryProvider).addOrUpdateTodo(todo);
   }
+}
+
 
   /// Edit task
   Future<void> _editTask(
