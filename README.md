@@ -43,6 +43,7 @@ This application allows users to create, manage, and share tasks with other user
 <img width="1194" height="673" alt="image" src="https://github.com/user-attachments/assets/9251cb7c-e036-4980-9a30-1ec06911b897" />
 
 <p align="center">
+  <img width="390" height="754" alt="image" src="https://github.com/user-attachments/assets/33ce8485-bdc1-4e9c-81f1-700275add8ce" />
   <img src="https://github.com/user-attachments/assets/0feacd4d-a128-4604-bb15-697f1a05d978" width="280" />
   <img src="https://github.com/user-attachments/assets/93ed1398-dbbd-4a20-bf65-89c45fcccfb6" width="280" />
   <img src="https://github.com/user-attachments/assets/1048ff7c-f642-4bb6-ba90-b1a9b140cc73" width="280" />
